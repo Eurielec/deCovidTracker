@@ -46,6 +46,17 @@ def get_events_by_nif_nie(db: Session, nif_nie: str):
         models.Event).filter(models.Event.nif_nie == nif_nie).all()
 
 
+def event_makes_sense(db: Session, nif_nie: str, type: str):
+    last_event = db.query(
+        models.Event).filter(models.Event.nif_nie == nif_nie).order_by(-models.Event.id).first()
+    print(last_event, type, nif_nie)
+    if last_event is None:
+        return True
+    if last_event.type != type:
+        return True
+    return False
+
+
 def create_event(db: Session, event: schemas.EventCreate):
     db_event = models.Event(
         type=event.type,

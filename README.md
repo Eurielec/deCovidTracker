@@ -19,6 +19,8 @@ A FOSS Covid Tracker for students associations
 ## To-Do
 
     * Automatically generate *exit* events for people who forgot at the end of the day.
+    * Deny entry if person is already inside.
+    * Deny exit if person is not inside.
 
 
 ## Contribute

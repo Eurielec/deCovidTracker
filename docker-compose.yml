@@ -1,23 +1,51 @@
-version: "3.7"
+version: "3.3"
 services:
+  covid-tracker-frontend:
+    build: ./deCovidTracker-frontend
+    image: covid-tracker-frontend
+    container_name: covid-tracker-frontend
+    restart: unless-stopped
+    ports:
+      - 5004:5000
+    environment:
+      # DONT CHANGE HERE, CHANGE .env FILE INSIDE PROJECT
+      # SINCE process.env is part of node, not the browser,
+      # variables get accessed during build
+      - REACT_APP_BACKEND_URL=$BACKEND_PREFIX.eurielec.etsit.upm.es
+      - REACT_APP_ASSOCIATION_NAME=$ASSOCIATION_NAME
+      - REACT_APP_MAX_PEOPLE_NUMBER=$MAX_PEOPLE_NUMBER
+      - TZ=Europe/Madrid
+
   covid-tracker-backend:
-    build: .
+    build: ./deCovidTracker
     image: covid-tracker-backend
-    name: covid-tracker-backend
+    container_name: covid-tracker-backend
     restart: unless-stopped
     ports:
       - 8001:80
     environment:
-      - TELEGRAM_BOT_TOKEN=<some_token>
-      - TELEGRAM_CHAT_ID=<some_id>
-      - MAX_PEOPLE=9
-      - ADMIN_USER=<some_admin>
-      - ADMIN_PASSWORD=<some_password>
-      - FRONTEND_URL=https://example.org
-      - DATABASE_NAME=postgres
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=postgres
-      - DATABASE_HOST=127.0.0.1
+      - TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
+      - TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID
+      - MAX_PEOPLE=$MAX_PEOPLE_NUMBER
+      - ADMIN_USER=$ADMIN_USER
+      - ADMIN_PASSWORD=$ADMIN_PASSWORD
+      - FRONTEND_URL=https://$FRONTEND_PREFIX.eurielec.etsit.upm.es
+      - DATABASE_NAME=$COVID_POSTGRES_DB
+      - DATABASE_USER=$COVID_POSTGRES_USER
+      - DATABASE_PASSWORD=$COVID_POSTGRES_PASSWORD
+      - DATABASE_HOST=covid-database
       - DATABASE_PORT=5432
       - LOG_FILE=covid-tracker.log
       - LOG_LEVEL=INFO
+      - TZ=Europe/Madrid
+
+  covid-database:
+    container_name: covid-database
+    image: bitnami/postgresql:13-debian-10
+    environment:
+      - POSTGRES_USER=$COVID_POSTGRES_USER
+      - POSTGRES_PASSWORD=$COVID_POSTGRES_PASSWORD
+      - POSTGRES_DB=$COVID_POSTGRES_DB
+    volumes:
+      - "$COVID_POSTGRES_DATA:/var/lib/postgresql/data"
+    restart: unless-stopped

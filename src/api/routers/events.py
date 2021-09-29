@@ -41,6 +41,12 @@ def create_event(event: schemas.EventCreate,
     if not validator.validate_event(event):
         raise HTTPException(status_code=422, detail="Event data is not valid")
 
+    result = crud.event_makes_sense(db, event.nif_nie, event.type)
+    print(result)
+    if not result:
+        raise HTTPException(
+            status_code=412, detail="Event is not natural")
+
     current = crud.get_current_people(db)
     if current >= MAX_PEOPLE and event.type == "access":
         bot.notify(
@@ -56,7 +62,8 @@ def create_event(event: schemas.EventCreate,
         )
     if event.type == "exit":
         bot.notify(
-            message="%s people @ Eurielec" % (current - 1),
+            message="%s people @ Eurielec" % ((current -
+                                              1) if current > 0 else current),
             title='Info',
         )
     return crud.create_event(db=db, event=event)

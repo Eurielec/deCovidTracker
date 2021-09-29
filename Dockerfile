@@ -1,4 +1,4 @@
-FROM python:3.9.7-slim
+FROM bitnami/python:3.9-prod
 
 WORKDIR /app
 
