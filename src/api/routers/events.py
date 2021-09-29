@@ -19,7 +19,7 @@ bot = telegram_bot.Bot()
 sec = http_security.HTTPSecurity()
 
 MAX_PEOPLE = int(os.environ.get("MAX_PEOPLE", 9))
-ASSOCIATION_NAME = int(os.environ.get("ASSOCIATION_NAME", "Local"))
+ASSOCIATION_NAME = os.environ.get("ASSOCIATION_NAME", "Local")
 
 
 @router.get("/")
