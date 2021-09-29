@@ -19,8 +19,15 @@ class Validator:
         # TODO: Validate also passports and others (for foreigners)
         # Check the format
         nif_nie = re.sub("[-, ]", "", nif_nie).strip()
-        if not re.match("^[0-9]{8,8}[A-Za-z]$", nif_nie):
+        if not re.match(
+            "(^[X,Y,Z][-, ]?[0-9]{7}[-, ]?[A-Z]$)|(^[0-9]{8,8}[-, ]?[A-Za-z]$)",
+                nif_nie):
             return False
+        if nif_nie[0] in "XYZ":
+            swap = {
+                "X": "0", "Y": "1", "Z": "2"
+            }
+            nif_nie = swap[nif_nie[0]] + nif_nie[1:]
         # Check the letter
         _letter = 'TRWAGMYFPDXBNJZSQVHLCKE'[int(nif_nie[:-1]) % 23]
         if nif_nie[-1] != _letter:

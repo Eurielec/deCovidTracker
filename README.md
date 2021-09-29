@@ -19,6 +19,7 @@ A FOSS Covid Tracker for students associations
 ## To-Do
 
 *   Automatically generate *exit* events for people who forgot at the end of the day.
+*   Write tests.
 
 
 ## Contribute

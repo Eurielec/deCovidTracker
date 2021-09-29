@@ -11,4 +11,4 @@ RUN pip install -r ./requirements/prod.txt --no-cache-dir
 
 
 # Start
-CMD ["uvicorn", "main:app", "--app-dir", "./src", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "main:app", "--app-dir", "./src", "--host", "0.0.0.0", "--port", "88"]
