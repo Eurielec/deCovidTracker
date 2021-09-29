@@ -19,6 +19,7 @@ bot = telegram_bot.Bot()
 sec = http_security.HTTPSecurity()
 
 MAX_PEOPLE = int(os.environ.get("MAX_PEOPLE", 9))
+ASSOCIATION_NAME = int(os.environ.get("ASSOCIATION_NAME", "Local"))
 
 
 @router.get("/")
@@ -50,20 +51,22 @@ def create_event(event: schemas.EventCreate,
     current = crud.get_current_people(db)
     if current >= MAX_PEOPLE and event.type == "access":
         bot.notify(
-            message="Someone could not access Eurielec. 9 people already inside.",
+            message="Someone could not access %s. %s people already inside." % (
+                ASSOCIATION_NAME, MAX_PEOPLE),
             title='Warning',
         )
         raise HTTPException(
             status_code=409, detail="Already %s people inside" % MAX_PEOPLE)
     if event.type == "access":
         bot.notify(
-            message="%s people @ Eurielec" % (current + 1),
+            message="%s people @ %s" % ((current + 1), ASSOCIATION_NAME),
             title="Warning" if (current + 1) >= 9 else "Info",
         )
     if event.type == "exit":
         bot.notify(
-            message="%s people @ Eurielec" % ((current -
-                                              1) if current > 0 else current),
+            message="%s people @ %s" % (((current -
+                                          1) if current > 0 else current),
+                                        ASSOCIATION_NAME),
             title='Info',
         )
     return crud.create_event(db=db, event=event)
