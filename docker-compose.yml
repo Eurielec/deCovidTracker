@@ -22,7 +22,7 @@ services:
     container_name: covid-tracker-backend
     restart: unless-stopped
     ports:
-      - 8001:88
+      - 8001:8001
     environment:
       - TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
       - TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID
