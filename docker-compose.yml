@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+  covid-tracker-backend:
+    build: .
+    image: covid-tracker-backend
+    name: covid-tracker-backend
+    restart: unless-stopped
+    ports:
+      - 8001:80
+    environment:
+      - TELEGRAM_BOT_TOKEN=<some_token>
+      - TELEGRAM_CHAT_ID=<some_id>
+      - MAX_PEOPLE=9
+      - ADMIN_USER=<some_admin>
+      - ADMIN_PASSWORD=<some_password>
+      - FRONTEND_URL=https://example.org
+      - DATABASE_NAME=postgres
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_HOST=127.0.0.1
+      - DATABASE_PORT=5432
+      - LOG_FILE=covid-tracker.log
+      - LOG_LEVEL=INFO

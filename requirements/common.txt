@@ -1,0 +1,7 @@
+psycopg2
+pytest
+fastapi
+async-exit-stack
+async-generator
+sqlalchemy
+apprise
