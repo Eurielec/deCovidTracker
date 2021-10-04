@@ -16,7 +16,6 @@ class Validator:
         Arguments:
             nif_nie (str): the spanish id number to validate.
         """
-        # TODO: Validate also passports and others (for foreigners)
         # Check the format
         nif_nie = re.sub("[-, ]", "", nif_nie).strip()
         if not re.match(

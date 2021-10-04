@@ -9,12 +9,13 @@ from typing import List
 from sql import crud, schemas
 from sql.main import get_db
 
-from utilities import validators, telegram_bot, http_security
+from utilities import validators, telegram_bot, http_security, normalizer
 
 router = APIRouter()
 security = HTTPBasic()
 
 validator = validators.Validator()
+normalizr = normalizer.Normalizer()
 bot = telegram_bot.Bot()
 sec = http_security.HTTPSecurity()
 
@@ -25,6 +26,12 @@ ASSOCIATION_NAME = os.environ.get("ASSOCIATION_NAME", "Local")
 @router.get("/")
 def read_root():
     return {"Hello": "Eurielec"}
+
+
+@router.post("/current", status_code=202)
+def read_current(response: Response, db: Session = Depends(get_db)):
+    current = crud.get_current_people(db)
+    return current
 
 
 @router.post("/event", response_model=schemas.Event, status_code=202)
@@ -41,8 +48,9 @@ def create_event(event: schemas.EventCreate,
     """
     if not validator.validate_event(event):
         raise HTTPException(status_code=422, detail="Event data is not valid")
+    event = normalizr.normalize_event(event)
 
-    result = crud.event_makes_sense(db, event.nif_nie, event.type)
+    result = crud.event_makes_sense(db, event.nif_nie, event.email, event.type)
     print(result)
     if not result:
         raise HTTPException(
