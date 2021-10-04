@@ -16,7 +16,7 @@ class Normalizer:
         Arguments:
             event (schemas.EventCreate): not normalized event
         """
-        event.email = event.mail.lower()
+        event.email = event.email.lower()
         event.nif_nie = event.nif_nie.upper()
         event.type = event.type.lower()
 
