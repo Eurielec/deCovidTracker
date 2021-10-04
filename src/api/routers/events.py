@@ -28,7 +28,7 @@ def read_root():
     return {"Hello": "Eurielec"}
 
 
-@router.post("/current", status_code=202)
+@router.post("/current", status_code=200)
 def read_current(response: Response, db: Session = Depends(get_db)):
     current = crud.get_current_people(db)
     return current
