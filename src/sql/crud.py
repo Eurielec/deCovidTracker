@@ -8,7 +8,7 @@ def get_event(db: Session, event_id: int):
     return db.query(models.Event).filter(models.Event.id == event_id).first()
 
 
-def get_events(db: Session, skip: int = 0, limit: int = 100):
+def get_events(db: Session, skip: int = 0, limit: int = 300):
     return db.query(models.Event).offset(skip).limit(limit).all()
 
 
@@ -19,7 +19,7 @@ def get_events_by_email(db: Session, email: str):
 
 def get_events_by_day(
         db: Session,
-        skip: int = 0, limit: int = 100,
+        skip: int = 0, limit: int = 300,
         _from: datetime = datetime.today().date(),
         _to: datetime = datetime.today().date() + timedelta(days=1)):
     return db.query(models.Event).filter(

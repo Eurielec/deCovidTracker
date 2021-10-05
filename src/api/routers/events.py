@@ -1,5 +1,5 @@
 import os
-import datetime
+from datetime import datetime, timedelta
 
 from fastapi import Response, Depends, APIRouter, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
@@ -111,10 +111,11 @@ def read_events_from_given_day(
         )
     try:
         if date == "today":
-            events = crud.get_events_by_day(db)
+            events = crud.get_events_by_day(db, _from=datetime.today(
+            ).date(), _to=(datetime.today().date() + timedelta(days=1)))
             return events
-        day = datetime.datetime.strptime(date, '%d-%m-%Y')
-        to = day + datetime.timedelta(days=1)
+        day = datetime.strptime(date, '%d-%m-%Y')
+        to = day + timedelta(days=1)
     except Exception as e:
         print(e)
         raise HTTPException(
@@ -138,8 +139,8 @@ def read_events_by_dates(
             headers={"WWW-Authenticate": "Basic"},
         )
     try:
-        _from = datetime.datetime.strptime(date1, '%d-%m-%Y')
-        _to = datetime.datetime.strptime(date2, '%d-%m-%Y')
+        _from = datetime.strptime(date1, '%d-%m-%Y')
+        _to = datetime.strptime(date2, '%d-%m-%Y')
     except Exception:
         raise HTTPException(
             status_code=400, detail="Provide date as: dd/mm/yyyy")
