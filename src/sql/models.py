@@ -16,5 +16,6 @@ class Event(Base):
     time = Column(DateTime, nullable=False)
     email = Column(String, nullable=False)
     nif_nie = Column(String, nullable=False)
+    association = Column(String, nullable=False)
 
     # items = relationship("Event")

@@ -1,22 +1,20 @@
-import os
 import secrets
 
-
-ADMIN_USER = os.environ.get("ADMIN_USER")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+from config import config
 
 
 class HTTPSecurity:
 
     def __init__(self):
-        self.username = ADMIN_USER
-        self.password = ADMIN_PASSWORD
+        c = config.Config()
+        self.a_configs = c.get_associations_configs()
 
-    def validate_admin(self, username: str = "", password: str = ""):
+    def validate_admin(self, association, username: str = "",
+                       password: str = ""):
         correct_username = secrets.compare_digest(
-            username, self.username)
+            username, self.a_configs[association]["admin_username"])
         correct_password = secrets.compare_digest(
-            password, self.password)
+            password, self.a_configs[association]["admin_password"])
         if not (correct_username and correct_password):
             return False
         return True

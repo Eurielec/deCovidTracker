@@ -8,8 +8,10 @@ def get_event(db: Session, event_id: int):
     return db.query(models.Event).filter(models.Event.id == event_id).first()
 
 
-def get_events(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Event).offset(skip).limit(limit).all()
+def get_events(db: Session, association: str, skip: int = 0, limit: int = 300):
+    return db.query(models.Event).filter(
+        models.Event.association == association
+    ).offset(skip).limit(limit).all()
 
 
 def get_events_by_email(db: Session, email: str):
@@ -19,21 +21,26 @@ def get_events_by_email(db: Session, email: str):
 
 def get_events_by_day(
         db: Session,
-        skip: int = 0, limit: int = 100,
+        association: str,
+        skip: int = 0, limit: int = 300,
         _from: datetime = datetime.today().date(),
         _to: datetime = datetime.today().date() + timedelta(days=1)):
     return db.query(models.Event).filter(
+        models.Event.association == association).filter(
         models.Event.time > _from).filter(models.Event.time < _to).all()
 
 
 def get_current_people(
         db: Session,
+        association: str,
         _from: datetime = datetime.today().date(),
         _to: datetime = datetime.today().date() + timedelta(days=1)):
     accessed = db.query(models.Event).filter(
+        models.Event.association == association).filter(
         models.Event.time > _from).filter(models.Event.time < _to).filter(
             models.Event.type == "access").count()
     exited = db.query(models.Event).filter(
+        models.Event.association == association).filter(
         models.Event.time > _from).filter(models.Event.time < _to).filter(
             models.Event.type == "exit").count()
     if (exited - accessed) > 0:
@@ -46,15 +53,18 @@ def get_events_by_nif_nie(db: Session, nif_nie: str):
         models.Event).filter(models.Event.nif_nie == nif_nie).all()
 
 
-def event_makes_sense(db: Session, nif_nie: str, email: str, type: str):
+def event_makes_sense(db: Session, nif_nie: str, email: str,
+                      type: str, association: str):
     last_event = db.query(
         models.Event
+    ).filter(
+        models.Event.association == association
     ).filter(
         models.Event.nif_nie == nif_nie
     ).filter(
         models.Event.email == email
     ).order_by(-models.Event.id).first()
-    print(last_event, type, nif_nie)
+    print(last_event, type, nif_nie, association)
     if last_event is None:
         return True
     if last_event.type != type:
@@ -63,11 +73,20 @@ def event_makes_sense(db: Session, nif_nie: str, email: str, type: str):
 
 
 def create_event(db: Session, event: schemas.EventCreate):
-    db_event = models.Event(
-        type=event.type,
-        time=datetime.now(),
-        email=event.email,
-        nif_nie=event.nif_nie)
+    try:
+        db_event = models.Event(
+            type=event.type,
+            time=datetime.now(),
+            email=event.email,
+            nif_nie=event.nif_nie,
+            association=event.association)
+    except Exception:
+        db_event = models.Event(
+            type=event["type"],
+            time=datetime.now(),
+            email=event["email"],
+            nif_nie=event["nif_nie"],
+            association=event["association"])
     db.add(db_event)
     db.commit()
     db.refresh(db_event)

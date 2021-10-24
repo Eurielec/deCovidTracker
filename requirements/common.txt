@@ -5,3 +5,4 @@ async-exit-stack
 async-generator
 sqlalchemy
 apprise
+schedule

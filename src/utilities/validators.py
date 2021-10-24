@@ -1,4 +1,5 @@
 import re
+from config import config
 
 
 class Validator:
@@ -7,6 +8,7 @@ class Validator:
         """
         Create Validator instance
         """
+        self.config = config.Config()
         return
 
     def validate_nif_nie(self, nif_nie: str):
@@ -49,9 +51,15 @@ class Validator:
             return False
         return True
 
+    def validate_association(self, association: str):
+        if self.config.get_association_config(association) is None:
+            return False
+        return True
+
     def validate_event(self, event):
         if (self.validate_email(event.email)
             and self.validate_type(event.type)
-                and self.validate_nif_nie(event.nif_nie)):
+            and self.validate_nif_nie(event.nif_nie)
+                and self.validate_association(event.association)):
             return True
         return False

@@ -14,6 +14,7 @@ class EventBase(BaseModel):
     email: str
     nif_nie: str
     time: datetime.datetime
+    association: str
 
 
 # Any additional attributes needed for creation

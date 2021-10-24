@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.routers import events
+from api.routers import tasks
+# from utilities import task
 
 app = FastAPI(title="deCovidTracker",
               events={
@@ -11,6 +13,7 @@ app = FastAPI(title="deCovidTracker",
                   "time": "datetime object of the event",
                   "email": "upm email account",
                   "nif_nie": "spanish id",
+                  "association": "association name"
               })
 
 origins = [
@@ -27,3 +30,7 @@ app.add_middleware(
 )
 
 app.include_router(events.router)
+app.include_router(tasks.router)
+
+# t = task.Task()
+# t.start()

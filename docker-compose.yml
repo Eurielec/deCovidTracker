@@ -6,14 +6,12 @@ services:
     container_name: covid-tracker-frontend
     restart: unless-stopped
     ports:
-      - 5004:5000
+      - 5004:5001
     environment:
       # DONT CHANGE HERE, CHANGE .env FILE INSIDE PROJECT
       # SINCE process.env is part of node, not the browser,
       # variables get accessed during build
       - REACT_APP_BACKEND_URL=$BACKEND_PREFIX.eurielec.etsit.upm.es
-      - REACT_APP_ASSOCIATION_NAME=$ASSOCIATION_NAME
-      - REACT_APP_MAX_PEOPLE_NUMBER=$MAX_PEOPLE_NUMBER
       - TZ=Europe/Madrid
 
   covid-tracker-backend:
@@ -23,12 +21,12 @@ services:
     restart: unless-stopped
     ports:
       - 8001:8001
+    volumes:
+      - "$CONFIG_FILE:/app/config.json"
     environment:
       - TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN
-      - TELEGRAM_CHAT_ID=$TELEGRAM_CHAT_ID
-      - MAX_PEOPLE=$MAX_PEOPLE_NUMBER
-      - ADMIN_USER=$ADMIN_USER
-      - ADMIN_PASSWORD=$ADMIN_PASSWORD
+      - SMTP_PORT=$SMTP_PORT
+      - SMTP_HOST=$SMTP_HOST
       - FRONTEND_URL=https://$FRONTEND_PREFIX.eurielec.etsit.upm.es
       - DATABASE_NAME=$COVID_POSTGRES_DB
       - DATABASE_USER=$COVID_POSTGRES_USER
@@ -36,6 +34,7 @@ services:
       - DATABASE_HOST=covid-database
       - DATABASE_PORT=5432
       - LOG_FILE=covid-tracker.log
+      - CONFIG_FILE=/app/config.json
       - LOG_LEVEL=INFO
       - TZ=Europe/Madrid
 
