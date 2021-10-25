@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routers import events
 from api.routers import tasks
 from api.routers import monitor
+from api.routers import management
 from api.routers import root
 # from utilities import task
 
@@ -34,6 +35,7 @@ app.add_middleware(
 app.include_router(events.router)
 app.include_router(tasks.router)
 app.include_router(monitor.router)
+app.include_router(management.router)
 app.include_router(root.router)
 
 # t = task.Task()

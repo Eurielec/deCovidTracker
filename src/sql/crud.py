@@ -10,6 +10,10 @@ def get_event(db: Session, event_id: int):
     return db.query(models.Event).filter(models.Event.id == event_id).first()
 
 
+def delete_event(db: Session, event_id: int):
+    return db.query(models.Event).filter(models.Event.id == event_id).delete()
+
+
 def get_events(db: Session, association: str, skip: int = 0, limit: int = 300):
     return db.query(models.Event).filter(
         models.Event.association == association
@@ -95,7 +99,9 @@ def event_makes_sense(db: Session, nif_nie: str, email: str,
     ).filter(
         or_(models.Event.nif_nie == nif_nie, models.Event.email == email)
     ).order_by(-models.Event.id).first()
-    if last_event is None:
+    if last_event is None and type == "exit":
+        return False
+    if last_event is None and type == "access":
         return True
     if last_event.type != type:
         return True
