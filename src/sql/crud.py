@@ -56,11 +56,11 @@ def get_current_people_data(
     accessed = db.query(models.Event).filter(
         models.Event.association == association).filter(
         models.Event.time > _from).filter(models.Event.time < _to).filter(
-            models.Event.type == "access").count()
+            models.Event.type == "access")
     exited = db.query(models.Event).filter(
         models.Event.association == association).filter(
         models.Event.time > _from).filter(models.Event.time < _to).filter(
-            models.Event.type == "exit").count()
+            models.Event.type == "exit")
     results = {}
     for key, value in accessed.items():
         try:
