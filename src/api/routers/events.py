@@ -34,6 +34,13 @@ def read_current(association, response: Response,
     return current
 
 
+@router.get("/current/{association}/human", status_code=200)
+def read_current_human(association, response: Response,
+                       db: Session = Depends(get_db)):
+    current = crud.get_current_people_data(db, association)
+    return current
+
+
 @router.post("/event", response_model=schemas.Event, status_code=202)
 def create_event(event: schemas.EventCreate,
                  response: Response,

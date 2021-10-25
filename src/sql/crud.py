@@ -48,6 +48,37 @@ def get_current_people(
     return accessed - exited
 
 
+def get_current_people_data(
+        db: Session,
+        association: str,
+        _from: datetime = datetime.today().date(),
+        _to: datetime = datetime.today().date() + timedelta(days=1)):
+    accessed = db.query(models.Event).filter(
+        models.Event.association == association).filter(
+        models.Event.time > _from).filter(models.Event.time < _to).filter(
+            models.Event.type == "access").count()
+    exited = db.query(models.Event).filter(
+        models.Event.association == association).filter(
+        models.Event.time > _from).filter(models.Event.time < _to).filter(
+            models.Event.type == "exit").count()
+    results = {}
+    for key, value in accessed.items():
+        try:
+            current = results[key]
+        except Exception:
+            current = 0
+        current = current - 1
+        results[key] = current
+    for key, value in exited.items():
+        try:
+            current = results[key]
+        except Exception:
+            current = 0
+        current = current + 1
+        results[key] = current
+    return ["%s\n" % key for key, value in results.items() if value == 1]
+
+
 def get_events_by_nif_nie(db: Session, nif_nie: str):
     return db.query(
         models.Event).filter(models.Event.nif_nie == nif_nie).all()

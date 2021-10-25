@@ -52,6 +52,7 @@ class Validator:
         return True
 
     def validate_association(self, association: str):
+        print(association)
         if self.config.get_association_config(association) is None:
             return False
         return True

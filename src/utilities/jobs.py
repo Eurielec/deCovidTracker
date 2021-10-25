@@ -21,10 +21,10 @@ class Job:
         return
 
     def mail(self, db):
-        print("Running monthly mail")
         """
         Send mail with association's events. Should run every month.
         """
+        print("Running monthly mail")
         for association, a_config in self.associations_configs.items():
             data = get_events_by_day(
                 db,

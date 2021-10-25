@@ -19,6 +19,6 @@ class Normalizer:
         event.email = event.email.lower()
         event.nif_nie = event.nif_nie.upper()
         event.type = event.type.lower()
-        event.association = event.association.lower()
+        # event.association = event.association.lower()
 
         return event
