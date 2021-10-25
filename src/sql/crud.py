@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import _or
+from sqlalchemy import or_
 from datetime import datetime, timedelta
 
 from . import models, schemas
@@ -93,7 +93,7 @@ def event_makes_sense(db: Session, nif_nie: str, email: str,
     ).filter(
         models.Event.association == association
     ).filter(
-        _or(models.Event.nif_nie == nif_nie, models.Event.email == email)
+        or_(models.Event.nif_nie == nif_nie, models.Event.email == email)
     ).order_by(-models.Event.id).first()
     print(last_event, type, nif_nie, association)
     if last_event is None:
