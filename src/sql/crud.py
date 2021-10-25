@@ -11,7 +11,9 @@ def get_event(db: Session, event_id: int):
 
 
 def delete_event(db: Session, event_id: int):
-    return db.query(models.Event).filter(models.Event.id == event_id).delete()
+    db.query(models.Event).filter(models.Event.id == event_id).delete()
+    db.session.commit()
+    return True
 
 
 def get_events(db: Session, association: str, skip: int = 0, limit: int = 300):
