@@ -68,11 +68,9 @@ def create_event(event: schemas.EventCreate,
         raise HTTPException(status_code=422, detail="Event data is not valid")
     event = normalizr.normalize_event(event)
     association_config = c.get_association_config(event.association)
-    print(association_config)
     max_people = association_config["max_people"]
     result = crud.event_makes_sense(
         db, event.nif_nie, event.email, event.type, event.association)
-    print(result)
     if not result:
         raise HTTPException(
             status_code=412, detail="Event is not natural")

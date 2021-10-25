@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, _or
 from datetime import datetime, timedelta
 
 from . import models, schemas
@@ -64,7 +64,7 @@ def get_current_people(
         _to: datetime = datetime.today().date() + timedelta(days=1)):
     accessed = get_accessed(db, association, _from=_from, _to=_to).count()
     exited = get_exited(db, association, _from=_from, _to=_to).count()
-    if (exited - accessed) > 0:
+    if (accessed - exited) < 0:
         return 0
     return accessed - exited
 
@@ -92,9 +92,7 @@ def event_makes_sense(db: Session, nif_nie: str, email: str,
     ).filter(
         models.Event.association == association
     ).filter(
-        models.Event.nif_nie == nif_nie
-    ).filter(
-        models.Event.email == email
+        _or(models.Event.nif_nie == nif_nie, models.Event.email == email)
     ).order_by(-models.Event.id).first()
     print(last_event, type, nif_nie, association)
     if last_event is None:
