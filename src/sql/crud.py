@@ -62,20 +62,20 @@ def get_current_people_data(
         models.Event.time > _from).filter(models.Event.time < _to).filter(
             models.Event.type == "exit")
     results = {}
-    for key, value in accessed.items():
+    for entry in accessed:
         try:
-            current = results[key]
+            current = results[entry.email]
         except Exception:
             current = 0
         current = current - 1
-        results[key] = current
-    for key, value in exited.items():
+        results[entry.email] = current
+    for entry in exited:
         try:
-            current = results[key]
+            current = results[entry.email]
         except Exception:
             current = 0
         current = current + 1
-        results[key] = current
+        results[entry.email] = current
     return ["%s\n" % key for key, value in results.items() if value == 1]
 
 
