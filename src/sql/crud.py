@@ -12,7 +12,7 @@ def get_event(db: Session, event_id: int):
 
 def delete_event(db: Session, event_id: int):
     db.query(models.Event).filter(models.Event.id == event_id).delete()
-    db.session.commit()
+    db.commit()
     return True
 
 
