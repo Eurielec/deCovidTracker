@@ -36,7 +36,17 @@ def read_current(association, response: Response,
 
 @router.get("/current/{association}/human", status_code=200)
 def read_current_human(association, response: Response,
-                       db: Session = Depends(get_db)):
+                       db: Session = Depends(get_db),
+                       credentials: HTTPBasicCredentials = Depends(security)):
+    if not sec.validate_admin(
+            association,
+            username=credentials.username,
+            password=credentials.password):
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect user or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
     current = crud.get_current_people_data(db, association)
     return current
 

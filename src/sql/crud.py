@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 
 from . import models, schemas
+from utilities import helpers
 
 
 def get_event(db: Session, event_id: int):
@@ -30,19 +31,39 @@ def get_events_by_day(
         models.Event.time > _from).filter(models.Event.time < _to).all()
 
 
-def get_current_people(
+def get_accessed(
         db: Session,
         association: str,
+        skip: int = 0, limit: int = 0,
         _from: datetime = datetime.today().date(),
         _to: datetime = datetime.today().date() + timedelta(days=1)):
     accessed = db.query(models.Event).filter(
         models.Event.association == association).filter(
         models.Event.time > _from).filter(models.Event.time < _to).filter(
-            models.Event.type == "access").count()
+            models.Event.type == "access")
+    return accessed
+
+
+def get_exited(
+        db: Session,
+        association: str,
+        skip: int = 0, limit: int = 0,
+        _from: datetime = datetime.today().date(),
+        _to: datetime = datetime.today().date() + timedelta(days=1)):
     exited = db.query(models.Event).filter(
         models.Event.association == association).filter(
         models.Event.time > _from).filter(models.Event.time < _to).filter(
-            models.Event.type == "exit").count()
+            models.Event.type == "exit")
+    return exited
+
+
+def get_current_people(
+        db: Session,
+        association: str,
+        _from: datetime = datetime.today().date(),
+        _to: datetime = datetime.today().date() + timedelta(days=1)):
+    accessed = get_accessed(db, association, _from=_from, _to=_to).count()
+    exited = get_exited(db, association, _from=_from, _to=_to).count()
     if (exited - accessed) > 0:
         return 0
     return accessed - exited
@@ -53,30 +74,10 @@ def get_current_people_data(
         association: str,
         _from: datetime = datetime.today().date(),
         _to: datetime = datetime.today().date() + timedelta(days=1)):
-    accessed = db.query(models.Event).filter(
-        models.Event.association == association).filter(
-        models.Event.time > _from).filter(models.Event.time < _to).filter(
-            models.Event.type == "access")
-    exited = db.query(models.Event).filter(
-        models.Event.association == association).filter(
-        models.Event.time > _from).filter(models.Event.time < _to).filter(
-            models.Event.type == "exit")
-    results = {}
-    for entry in accessed:
-        try:
-            current = results[entry.email]
-        except Exception:
-            current = 0
-        current = current + 1
-        results[entry.email] = current
-    for entry in exited:
-        try:
-            current = results[entry.email]
-        except Exception:
-            current = 0
-        current = current - 1
-        results[entry.email] = current
-    return ", ".join([key for key, value in results.items() if value == 1])
+    accessed = get_accessed(db, association, _from=_from, _to=_to)
+    exited = get_exited(db, association, _from=_from, _to=_to)
+    inside = helpers.calculate_people_inside(accessed, exited)
+    return inside
 
 
 def get_events_by_nif_nie(db: Session, nif_nie: str):
