@@ -124,7 +124,7 @@ def read_events_from_given_day(
         raise HTTPException(
             status_code=400, detail="Provide date as: dd/mm/yyyy")
     events = crud.get_events_by_day(
-        db, _from=day, _to=to, skip=skip, limit=limit)
+        db, association, _from=day, _to=to, skip=skip, limit=limit)
     return events
 
 
