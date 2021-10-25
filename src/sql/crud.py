@@ -1,4 +1,5 @@
-from sqlalchemy.orm import Session, _or
+from sqlalchemy.orm import Session
+from sqlalchemy import _or
 from datetime import datetime, timedelta
 
 from . import models, schemas
