@@ -76,7 +76,7 @@ def get_current_people_data(
             current = 0
         current = current - 1
         results[entry.email] = current
-    return "\n".join([key for key, value in results.items() if value == 1])
+    return ", ".join([key for key, value in results.items() if value == 1])
 
 
 def get_events_by_nif_nie(db: Session, nif_nie: str):
