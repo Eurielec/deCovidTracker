@@ -1,3 +1,9 @@
+from utilities import telegram_bot
+
+
+bot = telegram_bot.Bot()
+
+
 def calculate_people_inside(accessed, exited):
     results = {}
     for entry in accessed:
@@ -15,3 +21,28 @@ def calculate_people_inside(accessed, exited):
         current = current - 1
         results[entry.email] = current
     return ", ".join([key for key, value in results.items() if value == 1])
+
+
+def evaluate_and_notify(current, association, max_people, type):
+    if current + 1 >= max_people and type == "access":
+        bot.notify(
+            message="Limit has just been reached.",
+            title='Warning',
+            association=association
+        )
+        return
+    if current >= max_people and type == "exit":
+        bot.notify(
+            message="Space available now.",
+            title='Info',
+            association=association
+        )
+        return
+    if current >= max_people and type == "access":
+        bot.notify(
+            message="Someone could not access %s. %s people already inside." % (
+                association, max_people),
+            title='Access denied',
+            association=association
+        )
+        return

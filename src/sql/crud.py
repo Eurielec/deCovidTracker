@@ -21,6 +21,11 @@ def get_events_by_email(db: Session, email: str):
         models.Event).filter(models.Event.email == email).all()
 
 
+def get_events_by_nif_nie(db: Session, nif_nie: str):
+    return db.query(
+        models.Event).filter(models.Event.nif_nie == nif_nie).all()
+
+
 def get_events_by_day(
         db: Session,
         association: str,
@@ -81,11 +86,6 @@ def get_current_people_data(
     return inside
 
 
-def get_events_by_nif_nie(db: Session, nif_nie: str):
-    return db.query(
-        models.Event).filter(models.Event.nif_nie == nif_nie).all()
-
-
 def event_makes_sense(db: Session, nif_nie: str, email: str,
                       type: str, association: str):
     last_event = db.query(
@@ -95,7 +95,6 @@ def event_makes_sense(db: Session, nif_nie: str, email: str,
     ).filter(
         or_(models.Event.nif_nie == nif_nie, models.Event.email == email)
     ).order_by(-models.Event.id).first()
-    print(last_event, type, nif_nie, association)
     if last_event is None:
         return True
     if last_event.type != type:
