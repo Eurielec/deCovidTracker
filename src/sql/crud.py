@@ -67,16 +67,16 @@ def get_current_people_data(
             current = results[entry.email]
         except Exception:
             current = 0
-        current = current - 1
+        current = current + 1
         results[entry.email] = current
     for entry in exited:
         try:
             current = results[entry.email]
         except Exception:
             current = 0
-        current = current + 1
+        current = current - 1
         results[entry.email] = current
-    return ["%s\n" % key for key, value in results.items() if value == 1]
+    return "\n".join([key for key, value in results.items() if value == 1])
 
 
 def get_events_by_nif_nie(db: Session, nif_nie: str):
