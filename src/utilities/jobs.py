@@ -41,7 +41,7 @@ class Job:
                          entry.nif_nie, entry.association])) + "\n"
             self.e.send_email(a_config['to_email'], association, csv)
 
-    def close_association_events(db, association):
+    def close_association_events(self, db, association):
         data = get_events_by_day(
             db,
             association,
