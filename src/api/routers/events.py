@@ -8,7 +8,7 @@ from typing import List
 from sql import crud, schemas
 from sql.main import get_db
 
-from utilities import validators, http_security, normalizer, helpers
+from utilities import validators, http_security, normalizer, helpers, jobs
 from config import config
 
 router = APIRouter()
@@ -17,6 +17,7 @@ security = HTTPBasic()
 validator = validators.Validator()
 normalizr = normalizer.Normalizer()
 sec = http_security.HTTPSecurity()
+j = jobs.Job()
 c = config.Config()
 
 
@@ -44,6 +45,23 @@ def read_event(event_id: int, db: Session = Depends(get_db),
             headers={"WWW-Authenticate": "Basic"},
         )
     return db_event
+
+
+@router.get("/events/{association}/reset", status_code=200)
+def trigger_close_open_events(
+        association, db: Session = Depends(get_db),
+        credentials: HTTPBasicCredentials = Depends(security)):
+    if not sec.validate_admin(
+            association,
+            username=credentials.username,
+            password=credentials.password):
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect user or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    j.close_open_events(db, association=association)
+    return {"result": "success"}
 
 
 @router.post("/event", response_model=schemas.Event, status_code=202)
