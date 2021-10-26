@@ -60,7 +60,7 @@ def trigger_close_open_events(
             detail="Incorrect user or password",
             headers={"WWW-Authenticate": "Basic"},
         )
-    j.close_open_events(db, association=association)
+    j.close_association_events(db, association)
     return {"result": "success"}
 
 

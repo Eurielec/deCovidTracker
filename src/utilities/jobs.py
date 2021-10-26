@@ -69,13 +69,9 @@ class Job:
                 }
                 create_event(db, new_event)
 
-    def close_open_events(self, db, association=None):
+    def close_open_events(self, db):
         """
         Close open events. Should be called at the end of the day.
         """
-        if association is not None:
+        for association, a_config in self.associations_configs.items():
             self.close_association_events(db, association)
-            return
-        else:
-            for association, a_config in self.associations_configs.items():
-                self.close_association_events(db, association)
