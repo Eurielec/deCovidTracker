@@ -97,7 +97,8 @@ def create_event(event: schemas.EventCreate,
     return crud.create_event(db=db, event=event)
 
 
-@router.get("/events/{association}", response_model=List[schemas.Event])
+@router.get("/events/{association}")
+# response_model=List[schemas.Event])
 def read_events(association, format: str = "csv", skip: int = 0,
                 limit: int = 300, db: Session = Depends(get_db),
                 credentials: HTTPBasicCredentials = Depends(security)):
@@ -123,7 +124,8 @@ def read_events(association, format: str = "csv", skip: int = 0,
     return events
 
 
-@router.get("/events/{association}/{date}", response_model=List[schemas.Event])
+@router.get("/events/{association}/{date}")
+# response_model=List[schemas.Event])
 def read_events_from_given_day(
     association, date, format: str = "csv", skip: int = 0, limit: int = 100,
         db: Session = Depends(get_db),
@@ -150,6 +152,8 @@ def read_events_from_given_day(
             events = crud.get_events_by_day(
                 db, association, _from=datetime.today(
                 ).date(), _to=(datetime.today().date() + timedelta(days=1)))
+            if format == "csv":
+                return helpers.json_to_csv(events)
             return events
         day = datetime.strptime(date, '%d-%m-%Y')
         to = day + timedelta(days=1)
@@ -164,8 +168,8 @@ def read_events_from_given_day(
     return events
 
 
-@router.get("/events/{association}/{date1}/{date2}",
-            response_model=List[schemas.Event])
+@router.get("/events/{association}/{date1}/{date2}")
+# response_model=List[schemas.Event])
 def read_events_by_dates(
         association, date1, date2, format: str = "csv",
         skip: int = 0, limit: int = 100,
