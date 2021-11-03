@@ -59,4 +59,4 @@ def json_to_csv(data):
                 lambda x: str(x),
                 [entry.id, entry.time, entry.type, entry.email,
                  entry.nif_nie, entry.association])) + "\n"
-        return csv
+    return csv

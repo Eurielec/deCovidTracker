@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from fastapi import Response, Depends, APIRouter, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from sqlalchemy.orm import Session
-from typing import List
 
 from sql import crud, schemas
 from sql.main import get_db
@@ -99,8 +98,8 @@ def create_event(event: schemas.EventCreate,
 
 @router.get("/events/{association}")
 # response_model=List[schemas.Event])
-def read_events(association, format: str = "csv", skip: int = 0,
-                limit: int = 300, db: Session = Depends(get_db),
+def read_events(association, response: Response, format: str = "csv",
+                skip: int = 0, limit: int = 300, db: Session = Depends(get_db),
                 credentials: HTTPBasicCredentials = Depends(security)):
     """
     Get all the events of the given association. By default limited to the last
@@ -120,15 +119,17 @@ def read_events(association, format: str = "csv", skip: int = 0,
         )
     events = crud.get_events(db, association, skip=skip, limit=limit)
     if format == "csv":
-        return helpers.json_to_csv(events)
+        return Response(
+            content=helpers.json_to_csv(events),
+            media_type="application/csv")
     return events
 
 
 @router.get("/events/{association}/{date}")
 # response_model=List[schemas.Event])
 def read_events_from_given_day(
-    association, date, format: str = "csv", skip: int = 0, limit: int = 100,
-        db: Session = Depends(get_db),
+        association, date, response: Response, format: str = "csv",
+        skip: int = 0, limit: int = 100, db: Session = Depends(get_db),
         credentials: HTTPBasicCredentials = Depends(security)):
     """
     Get events for a given association for a given date. Date can be `today`
@@ -153,8 +154,12 @@ def read_events_from_given_day(
                 db, association, _from=datetime.today(
                 ).date(), _to=(datetime.today().date() + timedelta(days=1)))
             if format == "csv":
-                return helpers.json_to_csv(events)
-            return events
+                return Response(
+                    content=helpers.json_to_csv(events),
+                    media_type="application/csv")
+            return Response(
+                content=helpers.json_to_csv(events),
+                media_type="application/csv")
         day = datetime.strptime(date, '%d-%m-%Y')
         to = day + timedelta(days=1)
     except Exception as e:
@@ -164,14 +169,16 @@ def read_events_from_given_day(
     events = crud.get_events_by_day(
         db, association, _from=day, _to=to, skip=skip, limit=limit)
     if format == "csv":
-        return helpers.json_to_csv(events)
+        return Response(
+            content=helpers.json_to_csv(events),
+            media_type="application/csv")
     return events
 
 
 @router.get("/events/{association}/{date1}/{date2}")
 # response_model=List[schemas.Event])
 def read_events_by_dates(
-        association, date1, date2, format: str = "csv",
+        association, date1, date2, response: Response, format: str = "csv",
         skip: int = 0, limit: int = 100,
         db: Session = Depends(get_db),
         credentials: HTTPBasicCredentials = Depends(security)):
@@ -202,5 +209,7 @@ def read_events_by_dates(
     events = crud.get_events_by_day(
         db, association, _from=_from, _to=_to, skip=skip, limit=limit)
     if format == "csv":
-        return helpers.json_to_csv(events)
+        return Response(
+            content=helpers.json_to_csv(events),
+            media_type="application/csv")
     return events
