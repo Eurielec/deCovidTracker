@@ -22,6 +22,7 @@ def read_current(association, response: Response,
     Parameters:
         * association: a valid association.
     """
+    print("Reading current")
     current = crud.get_current_people(db, association)
     return current
 
@@ -36,6 +37,7 @@ def read_current_human(association, response: Response,
     Parameters:
         * association: a valid association.
     """
+    print("Checking security")
     if not sec.validate_admin(
             association,
             username=credentials.username,
@@ -46,4 +48,5 @@ def read_current_human(association, response: Response,
             headers={"WWW-Authenticate": "Basic"},
         )
     current = crud.get_current_people_data(db, association)
+    print("Current emails", current)
     return current

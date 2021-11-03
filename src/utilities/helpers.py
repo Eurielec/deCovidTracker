@@ -46,3 +46,17 @@ def evaluate_and_notify(current, association, max_people, type):
             association=association
         )
         return
+
+
+def json_to_csv(data):
+    """
+    Read monthly events from database as csv.
+    """
+    csv = ""
+    for entry in data:
+        csv += ",".join(
+            map(
+                lambda x: str(x),
+                [entry.id, entry.time, entry.type, entry.email,
+                 entry.nif_nie, entry.association])) + "\n"
+        return csv

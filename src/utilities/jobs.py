@@ -4,7 +4,7 @@ Module to define jobs to be executed as tasks on schedule.
 from datetime import datetime, timedelta
 
 from config import config
-from utilities import mail
+from utilities import mail, helpers
 from sql.crud import get_events_by_day, create_event
 
 
@@ -32,13 +32,7 @@ class Job:
                 limit=0,
                 _from=datetime.today().date() - timedelta(days=31),
                 _to=datetime.today().date() + timedelta(days=1))
-            csv = ""
-            for entry in data:
-                csv += ",".join(
-                    map(
-                        lambda x: str(x),
-                        [entry.id, entry.time, entry.type, entry.email,
-                         entry.nif_nie, entry.association])) + "\n"
+            csv = helpers.json_to_csv(data)
             self.e.send_email(a_config['to_email'], association, csv)
 
     def close_association_events(self, db, association):

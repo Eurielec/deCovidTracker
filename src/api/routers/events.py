@@ -98,8 +98,8 @@ def create_event(event: schemas.EventCreate,
 
 
 @router.get("/events/{association}", response_model=List[schemas.Event])
-def read_events(association, skip: int = 0, limit: int = 300,
-                db: Session = Depends(get_db),
+def read_events(association, format: str = "csv", skip: int = 0,
+                limit: int = 300, db: Session = Depends(get_db),
                 credentials: HTTPBasicCredentials = Depends(security)):
     """
     Get all the events of the given association. By default limited to the last
@@ -118,12 +118,14 @@ def read_events(association, skip: int = 0, limit: int = 300,
             headers={"WWW-Authenticate": "Basic"},
         )
     events = crud.get_events(db, association, skip=skip, limit=limit)
+    if format == "csv":
+        return helpers.json_to_csv(events)
     return events
 
 
 @router.get("/events/{association}/{date}", response_model=List[schemas.Event])
 def read_events_from_given_day(
-    association, date, skip: int = 0, limit: int = 100,
+    association, date, format: str = "csv", skip: int = 0, limit: int = 100,
         db: Session = Depends(get_db),
         credentials: HTTPBasicCredentials = Depends(security)):
     """
@@ -157,13 +159,16 @@ def read_events_from_given_day(
             status_code=400, detail="Provide date as: dd/mm/yyyy")
     events = crud.get_events_by_day(
         db, association, _from=day, _to=to, skip=skip, limit=limit)
+    if format == "csv":
+        return helpers.json_to_csv(events)
     return events
 
 
 @router.get("/events/{association}/{date1}/{date2}",
             response_model=List[schemas.Event])
 def read_events_by_dates(
-    association, date1, date2, skip: int = 0, limit: int = 100,
+        association, date1, date2, format: str = "csv",
+        skip: int = 0, limit: int = 100,
         db: Session = Depends(get_db),
         credentials: HTTPBasicCredentials = Depends(security)):
     """
@@ -192,4 +197,6 @@ def read_events_by_dates(
             status_code=400, detail="Provide dates as: dd-mm-yyyy")
     events = crud.get_events_by_day(
         db, association, _from=_from, _to=_to, skip=skip, limit=limit)
+    if format == "csv":
+        return helpers.json_to_csv(events)
     return events

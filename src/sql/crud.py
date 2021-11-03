@@ -6,6 +6,27 @@ from . import models, schemas
 from utilities import helpers
 
 
+def create_event(db: Session, event: schemas.EventCreate):
+    try:
+        db_event = models.Event(
+            type=event.type,
+            time=datetime.now(),
+            email=event.email,
+            nif_nie=event.nif_nie,
+            association=event.association)
+    except Exception:
+        db_event = models.Event(
+            type=event["type"],
+            time=datetime.now(),
+            email=event["email"],
+            nif_nie=event["nif_nie"],
+            association=event["association"])
+    db.add(db_event)
+    db.commit()
+    db.refresh(db_event)
+    return db_event
+
+
 def get_event(db: Session, event_id: int):
     return db.query(models.Event).filter(models.Event.id == event_id).first()
 
@@ -76,6 +97,7 @@ def get_current_people(
         _to: datetime = datetime.today().date() + timedelta(days=1)):
     accessed = get_accessed(db, association, _from=_from, _to=_to).count()
     exited = get_exited(db, association, _from=_from, _to=_to).count()
+    print(accessed-exited)
     if (accessed - exited) < 0:
         return 0
     return accessed - exited
@@ -89,6 +111,7 @@ def get_current_people_data(
     accessed = get_accessed(db, association, _from=_from, _to=_to)
     exited = get_exited(db, association, _from=_from, _to=_to)
     inside = helpers.calculate_people_inside(accessed, exited)
+    print(inside)
     return inside
 
 
@@ -108,24 +131,3 @@ def event_makes_sense(db: Session, nif_nie: str, email: str,
     if last_event.type != type:
         return True
     return False
-
-
-def create_event(db: Session, event: schemas.EventCreate):
-    try:
-        db_event = models.Event(
-            type=event.type,
-            time=datetime.now(),
-            email=event.email,
-            nif_nie=event.nif_nie,
-            association=event.association)
-    except Exception:
-        db_event = models.Event(
-            type=event["type"],
-            time=datetime.now(),
-            email=event["email"],
-            nif_nie=event["nif_nie"],
-            association=event["association"])
-    db.add(db_event)
-    db.commit()
-    db.refresh(db_event)
-    return db_event
