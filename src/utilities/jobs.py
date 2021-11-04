@@ -29,7 +29,7 @@ class Job:
             data = get_events_by_day(
                 db,
                 association,
-                limit=0,
+                limit=None,
                 _from=datetime.today().date() - timedelta(days=31),
                 _to=datetime.today().date() + timedelta(days=1))
             csv = helpers.json_to_csv(data)
@@ -39,7 +39,7 @@ class Job:
         data = get_events_by_day(
             db,
             association,
-            limit=0,
+            limit=None,
             _from=datetime.today().date() - timedelta(days=31),
             _to=datetime.today().date() + timedelta(days=1))
         events_by_email = {}

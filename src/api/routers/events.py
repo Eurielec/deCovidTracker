@@ -99,7 +99,7 @@ def create_event(event: schemas.EventCreate,
 @router.get("/events/{association}")
 # response_model=List[schemas.Event])
 def read_events(association, response: Response, format: str = "csv",
-                skip: int = 0, limit: int = 300, db: Session = Depends(get_db),
+                skip: int = 0, limit: int = None, db: Session = Depends(get_db),
                 credentials: HTTPBasicCredentials = Depends(security)):
     """
     Get all the events of the given association. By default limited to the last
@@ -129,7 +129,7 @@ def read_events(association, response: Response, format: str = "csv",
 # response_model=List[schemas.Event])
 def read_events_from_given_day(
         association, date, response: Response, format: str = "csv",
-        skip: int = 0, limit: int = 100, db: Session = Depends(get_db),
+        skip: int = 0, limit: int = None, db: Session = Depends(get_db),
         credentials: HTTPBasicCredentials = Depends(security)):
     """
     Get events for a given association for a given date. Date can be `today`
@@ -179,7 +179,7 @@ def read_events_from_given_day(
 # response_model=List[schemas.Event])
 def read_events_by_dates(
         association, date1, date2, response: Response, format: str = "csv",
-        skip: int = 0, limit: int = 100,
+        skip: int = 0, limit: int = None,
         db: Session = Depends(get_db),
         credentials: HTTPBasicCredentials = Depends(security)):
     """
