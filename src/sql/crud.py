@@ -53,6 +53,11 @@ def get_events_by_nif_nie(db: Session, nif_nie: str):
         models.Event).filter(models.Event.nif_nie == nif_nie).all()
 
 
+def get_email_by_nif_nie(db: Session, nif_nie: str):
+    return db.query(models.Event).filter(
+        models.Event.nif_nie == nif_nie).last().email
+
+
 def get_events_by_day(
         db: Session,
         association: str,
@@ -114,7 +119,7 @@ def get_current_people_data(
                          timedelta(days=1))):
     accessed = get_accessed(db, association, _from=_from, _to=_to)
     exited = get_exited(db, association, _from=_from, _to=_to)
-    inside = helpers.calculate_people_inside(accessed, exited)
+    inside = helpers.calculate_people_inside(db, accessed, exited)
     print(inside)
     return inside
 

@@ -1,10 +1,11 @@
 from utilities import telegram_bot
+from sql.crud import get_email_by_nif_nie
 
 
 bot = telegram_bot.Bot()
 
 
-def calculate_people_inside(accessed, exited):
+def calculate_people_inside(db, accessed, exited):
     results = {}
     for entry in accessed:
         try:
@@ -20,7 +21,7 @@ def calculate_people_inside(accessed, exited):
             current = 0
         current = current - 1
         results[entry.nif_nie] = current
-    return ", ".join([key for key, value in results.items() if value == 1])
+    return ", ".join([get_email_by_nif_nie(db, key) for key, value in results.items() if value == 1])
 
 
 def evaluate_and_notify(current, association, max_people, type):
