@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from fastapi import Response, Depends, APIRouter, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
@@ -126,10 +126,10 @@ def read_events(association, response: Response, format: str = "csv",
     return events
 
 
-@router.get("/events/{association}/{date}")
+@router.get("/events/{association}/{dt}")
 # response_model=List[schemas.Event])
 def read_events_from_given_day(
-        association, date, response: Response, format: str = "csv",
+        association, dt, response: Response, format: str = "csv",
         skip: int = 0, limit: int = None, db: Session = Depends(get_db),
         credentials: HTTPBasicCredentials = Depends(security)):
     """
@@ -150,7 +150,7 @@ def read_events_from_given_day(
             headers={"WWW-Authenticate": "Basic"},
         )
     try:
-        if date == "today":
+        if dt == "today":
             events = crud.get_events_by_day(
                 db,
                 association,
@@ -162,10 +162,8 @@ def read_events_from_given_day(
                 return Response(
                     content=helpers.json_to_csv(events),
                     media_type="application/csv")
-            return Response(
-                content=helpers.json_to_csv(events),
-                media_type="application/csv")
-        day = datetime.strptime(date, '%d-%m-%Y')
+            return events
+        day = datetime.strptime(dt, '%d-%m-%Y')
         to = day + timedelta(days=1)
     except Exception as e:
         print(e)
