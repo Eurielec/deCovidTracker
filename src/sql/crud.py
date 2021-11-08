@@ -119,7 +119,7 @@ def get_current_people_data(
                          timedelta(days=1))):
     accessed = get_accessed(db, association, _from=_from, _to=_to)
     exited = get_exited(db, association, _from=_from, _to=_to)
-    inside = helpers.calculate_people_inside(db, accessed, exited)
+    inside = helpers.calculate_people_inside(accessed, exited)
     print(inside)
     return inside
 
