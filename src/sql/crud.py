@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from . import models, schemas
 from utilities import helpers
@@ -57,19 +57,21 @@ def get_events_by_day(
         db: Session,
         association: str,
         skip: int = 0, limit: int = 300,
-        _from: datetime = datetime.today().date(),
-        _to: datetime = datetime.today().date() + timedelta(days=1)):
+        _from: datetime = datetime.combine(date.today(), datetime.min.time()),
+        _to: datetime = (datetime.combine(date.today(), datetime.min.time()) +
+                         timedelta(days=1))):
     return db.query(models.Event).filter(
         models.Event.association == association).filter(
-        models.Event.time > _from).filter(models.Event.time < _to).all()
+        models.Event.time > _from).filter(
+        models.Event.time < _to).offset(skip).limit(limit).all()
 
 
 def get_accessed(
         db: Session,
         association: str,
-        skip: int = 0, limit: int = 0,
-        _from: datetime = datetime.today().date(),
-        _to: datetime = datetime.today().date() + timedelta(days=1)):
+        _from: datetime = datetime.combine(date.today(), datetime.min.time()),
+        _to: datetime = (datetime.combine(date.today(), datetime.min.time()) +
+                         timedelta(days=1))):
     accessed = db.query(models.Event).filter(
         models.Event.association == association).filter(
         models.Event.time > _from).filter(models.Event.time < _to).filter(
@@ -80,9 +82,9 @@ def get_accessed(
 def get_exited(
         db: Session,
         association: str,
-        skip: int = 0, limit: int = 0,
-        _from: datetime = datetime.today().date(),
-        _to: datetime = datetime.today().date() + timedelta(days=1)):
+        _from: datetime = datetime.combine(date.today(), datetime.min.time()),
+        _to: datetime = (datetime.combine(date.today(), datetime.min.time())
+                         + timedelta(days=1))):
     exited = db.query(models.Event).filter(
         models.Event.association == association).filter(
         models.Event.time > _from).filter(models.Event.time < _to).filter(
@@ -93,8 +95,9 @@ def get_exited(
 def get_current_people(
         db: Session,
         association: str,
-        _from: datetime = datetime.today().date(),
-        _to: datetime = datetime.today().date() + timedelta(days=1)):
+        _from: datetime = datetime.combine(date.today(), datetime.min.time()),
+        _to: datetime = (datetime.combine(date.today(), datetime.min.time())
+                         + timedelta(days=1))):
     accessed = get_accessed(db, association, _from=_from, _to=_to).count()
     exited = get_exited(db, association, _from=_from, _to=_to).count()
     print(accessed-exited)
@@ -106,8 +109,9 @@ def get_current_people(
 def get_current_people_data(
         db: Session,
         association: str,
-        _from: datetime = datetime.today().date(),
-        _to: datetime = datetime.today().date() + timedelta(days=1)):
+        _from: datetime = datetime.combine(date.today(), datetime.min.time()),
+        _to: datetime = (datetime.combine(date.today(), datetime.min.time()) +
+                         timedelta(days=1))):
     accessed = get_accessed(db, association, _from=_from, _to=_to)
     exited = get_exited(db, association, _from=_from, _to=_to)
     inside = helpers.calculate_people_inside(accessed, exited)
