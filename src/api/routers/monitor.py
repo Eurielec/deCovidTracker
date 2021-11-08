@@ -1,6 +1,7 @@
 from fastapi import Response, Depends, APIRouter, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from sqlalchemy.orm import Session
+from datetime import datetime, date, timedelta
 
 from sql import crud
 from sql.main import get_db
@@ -23,7 +24,13 @@ def read_current(association, response: Response,
         * association: a valid association.
     """
     print("Reading current")
-    current = crud.get_current_people(db, association)
+    current = crud.get_current_people(
+        db,
+        association,
+        _from=datetime.combine(date.today(), datetime.min.time()),
+        _to=datetime.combine(
+            date.today(), datetime.min.time()) + timedelta(days=1)
+    )
     return current
 
 
@@ -47,6 +54,11 @@ def read_current_human(association, response: Response,
             detail="Incorrect user or password",
             headers={"WWW-Authenticate": "Basic"},
         )
-    current = crud.get_current_people_data(db, association)
+    current = crud.get_current_people_data(
+        db,
+        association,
+        _from=datetime.combine(date.today(), datetime.min.time()),
+        _to=datetime.combine(
+            date.today(), datetime.min.time()) + timedelta(days=1))
     print("Current emails", current)
     return current

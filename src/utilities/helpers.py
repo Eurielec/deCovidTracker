@@ -4,7 +4,10 @@ from utilities import telegram_bot
 bot = telegram_bot.Bot()
 
 
-def calculate_people_inside(db, accessed, exited):
+def calculate_people_inside(accessed, exited):
+    email_by_nif_nie = {}
+    for entry in accessed:
+        email_by_nif_nie[entry.nif_nie] = entry.email
     results = {}
     for entry in accessed:
         try:
@@ -20,7 +23,8 @@ def calculate_people_inside(db, accessed, exited):
             current = 0
         current = current - 1
         results[entry.nif_nie] = current
-    return ", ".join([key for key, value in results.items() if value == 1])
+    return ", ".join(
+        [email_by_nif_nie[key] for key, value in results.items() if value == 1])
 
 
 def evaluate_and_notify(current, association, max_people, type):
