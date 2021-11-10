@@ -4,6 +4,9 @@ from fastapi import Response, Depends, APIRouter, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from sqlalchemy.orm import Session
 
+# Imports to handle locks
+import threading
+
 from sql import crud, schemas
 from sql.main import get_db
 
@@ -18,6 +21,7 @@ normalizr = normalizer.Normalizer()
 sec = http_security.HTTPSecurity()
 j = jobs.Job()
 c = config.Config()
+event_create_lock = threading.RLock()
 
 
 @router.get("/event/{event_id}", response_model=schemas.Event)
@@ -87,13 +91,17 @@ def create_event(event: schemas.EventCreate,
     if not result:
         raise HTTPException(
             status_code=412, detail="Event is not natural")
+    event_create_lock.aquire()
     current = crud.get_current_people(db, event.association)
     helpers.evaluate_and_notify(
         current, event.association, max_people, event.type)
     if current >= max_people and event.type == "access":
+        event_create_lock.release()
         raise HTTPException(
             status_code=409, detail="Already %s people inside" % max_people)
-    return crud.create_event(db=db, event=event)
+    event = crud.create_event(db=db, event=event)
+    event_create_lock.release()
+    return event
 
 
 @router.get("/events/{association}")
