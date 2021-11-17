@@ -91,16 +91,16 @@ def create_event(event: schemas.EventCreate,
     if not result:
         raise HTTPException(
             status_code=412, detail="Event is not natural")
-    event_create_lock.acquire()
+    # event_create_lock.acquire()
     current = crud.get_current_people(db, event.association)
     helpers.evaluate_and_notify(
         current, event.association, max_people, event.type)
     if current >= max_people and event.type == "access":
-        event_create_lock.release()
+        # event_create_lock.release()
         raise HTTPException(
             status_code=409, detail="Already %s people inside" % max_people)
     event = crud.create_event(db=db, event=event)
-    event_create_lock.release()
+    # event_create_lock.release()
     return event
 
 
